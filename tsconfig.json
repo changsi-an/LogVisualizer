@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+    "module": "commonjs",
+        "moduleResolution": "node",
+        "target": "es2016",
+        "sourceMap": true,
+        "outDir": "out",
+        "declaration": true,
+
+        "noUnusedLocals": true,
+        "noImplicitThis": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "strictFunctionTypes": false,
+        "lib": [
+            "dom",
+            "es6",
+            "es2016"
+        ]
+    },
+    "include": [
+        "src/**/*.ts",
+        "test/**/*.ts",
+        "node_modules/@types/**/*.ts"
+    ]
+}
