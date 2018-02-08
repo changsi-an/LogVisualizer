@@ -10,7 +10,10 @@ gulp.task('package.json', function () {
 });
 
 gulp.task('build', function () {
-    return gulp.src('src/**/*.ts')
+    return gulp.src([
+        'src/**/*.ts',
+        'src/**/*.tsx'
+        ])
         .pipe(sourcemaps.init())
         .pipe(tsProject())
         .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: './' }))

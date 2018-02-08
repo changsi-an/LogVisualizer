@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-    "module": "commonjs",
+        "module": "commonjs",
         "moduleResolution": "node",
         "target": "es2016",
         "sourceMap": true,
@@ -12,14 +12,17 @@
         "noFallthroughCasesInSwitch": true,
         "noImplicitReturns": true,
         "strictFunctionTypes": false,
+        "jsx": "react",
         "lib": [
             "dom",
             "es6",
-            "es2016"
+            "es2016",
+            "esnext.asynciterable"
         ]
     },
     "include": [
         "src/**/*.ts",
+        "src/**/*.tsx",
         "test/**/*.ts",
         "node_modules/@types/**/*.ts"
     ]
