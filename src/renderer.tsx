@@ -4,17 +4,14 @@ import * as stream from 'stream';
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {ReadLogFileContent, RPCService, services} from './RPCServices'
+import {createListItem} from './components';
 
 let readFileLogContent: RPCService<string> = services[ReadLogFileContent.Method];
 let fileContent: string;
 
 async function run(): Promise<void> {
 
-    let result = await readFileLogContent.call('');
-
-    console.log(result);
-
-    fileContent = result;
+    fileContent = await readFileLogContent.call('');
 
     ReactDOM.render(
             <List />,
@@ -22,12 +19,17 @@ async function run(): Promise<void> {
     );
 }
 
+export interface LineData {
+    sequence: number;
+    text: string;
+}
+
 class LogData {
-    private _rawdata: string;
+    private _rawData: string;
     private _lines: string[];
 
     constructor(input: string) {
-        this._rawdata = input;
+        this._rawData = input;
         this._lines = undefined;
     }
 
@@ -36,12 +38,18 @@ class LogData {
         }
     }
 
-    public async *readLine(): AsyncIterableIterator<string> {
+    public async *readLine(): AsyncIterableIterator<LineData> {
         if (!this._lines) {
             await this.unpackRawDataToLines();
         }
 
-        yield* this._lines;
+        let id = 1;
+        for (const line of this._lines) {
+            yield {
+                sequence: id++,
+                text: line
+            }
+        }
     }
 
     get LineCount(): number {
@@ -51,7 +59,7 @@ class LogData {
     private async unpackRawDataToLines(): Promise<void> {
         this._lines = [];
         let s = new stream.Readable();
-        s.push(this._rawdata);
+        s.push(this._rawData);
         s.push(null);
 
         const rl = readline.createInterface(s);
@@ -67,7 +75,8 @@ class LogData {
 }
 
 class List extends React.Component<{}, {
-    record: number
+    record: number,
+    rawLines: LineData[]
 }> {
 
     private _logData: LogData;
@@ -76,12 +85,28 @@ class List extends React.Component<{}, {
         super(props);
 
         this.state = {
-            record: 0
+            record: 0,
+            rawLines: []
         };
     }
 
     render() {
-        return <h1>Hi! {this.state.record}</h1>;
+        return <div id={'list'}>
+            <h1>Hi! {this.state.record}</h1>,
+            <div className={"content"}>
+                <ol>{
+                    this.state.rawLines.map((line) => createListItem({
+                        "key": line.sequence.toString(),
+                        line: line
+                    }))
+                }
+                </ol>
+            </div>,
+            <footer>Legend: <span className={'ToTarget'}>To Debugee</span> <span className={'FromTarget'}>From Debugee</span>
+                <span className={'FromClient'}>From VSCode / PineZorro</span>
+                <span className={'ToClient'}>To VSCode / PineZorro</span>
+            </footer>
+        </div>;
     }
 
     async componentDidMount() {
@@ -89,9 +114,15 @@ class List extends React.Component<{}, {
 
         await this._logData.preloadAllData();
 
+        let rawLines: LineData[] = [];
+
+        for await (const line of this._logData.readLine()) {
+            rawLines.push(line);
+        }
         this.setState({
-            record: this._logData.LineCount
-        })
+            record: this._logData.LineCount,
+            rawLines: rawLines
+        });
     }
 }
 

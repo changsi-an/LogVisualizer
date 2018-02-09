@@ -1,0 +1,41 @@
+@footer_height: 50px;
+
+@ToTargetColor: lighten(@FromTargetColor, 20%, relative);
+@FromTargetColor: rgb(219, 112, 147);
+
+@ToClientColor: darken(@FromClientColor, 20%, relative);
+@FromClientColor: DarkTurquoise;
+
+
+#list {
+  > footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: @footer_height;
+    background: white;
+    border-top: 1px solid black;
+  }
+
+  .content:after {
+    height: @footer_height;
+    content: "";
+    display: block;
+  }
+}
+
+.ToTarget {
+  background: @ToTargetColor;
+}
+
+.FromTarget {
+  background: @FromTargetColor;
+}
+
+.ToClient {
+  background: @ToClientColor;
+}
+
+.FromClient {
+  background: @FromClientColor;
+}
