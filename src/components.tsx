@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import {LineData} from './renderer'
 import {ReactNode} from "react";
 
@@ -74,7 +73,7 @@ export class PlainTextComponent extends React.Component<{
     text: PlainText
 }, {}>{
     render() {
-        return <span>{this.props.text.text}</span>
+        return <span className={this.props.text.style}>{this.props.text.text}</span>
     }
 }
 
@@ -84,9 +83,47 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
     }
 
 
-    protected CreateClauseComponents(): ReactNode {
-        const clauses: Clause[] = breakDownLogStatement(this.props.line.text);
+    protected CreateClauseComponents(): Clause[] {
+        return breakDownLogStatement(this.props.line.text);
+    }
 
+    protected reprocessFirstClause(search: string, style: string, clauses: Clause[]): Clause[] {
+        const [first, ...remainding] = clauses;
+
+        if (!(first instanceof PlainText)) {
+            return clauses;
+        }
+
+        const text = first.text;
+
+        const start = text.search(new RegExp(search, "i"));
+
+        if (start == -1) {
+            return clauses;
+        }
+
+        const end = start + search.length - 1;
+
+        let sections: Clause[] = [];
+        if (start > 0 ) {
+            sections.push(new PlainText(text.substring(0, start), first.start, first.start + start - 1));
+        }
+
+        const highlightened = new PlainText(text.substring(start, end + 1), first.start + start, first.start + end);
+
+        highlightened.style = style;
+        sections.push(highlightened);
+
+        if (end < text.length - 1 ) {
+            sections.push(new PlainText(text.substring(end + 1), first.start + end + 1, first.start + text.length - 1));
+        }
+
+        console.log(sections.concat(remainding));
+
+        return sections.concat(remainding);
+    }
+
+    protected renderClauses(clauses: Clause[]): ReactNode {
         return <React.Fragment>
             {
                 clauses.map((clause: Clause) => {
@@ -102,7 +139,6 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
 
         </React.Fragment>;
     }
-
 }
 
 class PlatTextListItemComponent extends ListItem {
@@ -114,32 +150,35 @@ class PlatTextListItemComponent extends ListItem {
 class ToTargetListItemComponent extends ListItem {
     constructor(props) {
         super(props);
-
-        console.log(breakDownLogStatement(this.props.line.text));
     }
 
     render(): React.ReactNode {
-        return <li key={this.props.line.sequence.toString()} className={'ToTarget'}>
-            {this.CreateClauseComponents()}
+        return <li key={this.props.line.sequence.toString()}>
+            {this.renderClauses(this.reprocessFirstClause("To target", "ToTarget", this.CreateClauseComponents()))}
         </li>;
     }
 }
 
 class FromTargetListItemComponent extends ListItem {
     render(): React.ReactNode {
-        return <li key={this.props.line.sequence.toString()} className={'FromTarget'}>{this.CreateClauseComponents()}</li>;
+        return <li key={this.props.line.sequence.toString()}>{
+            this.renderClauses(this.reprocessFirstClause("From target", "FromTarget", this.CreateClauseComponents()))}</li>;
     }
 }
 
 class ToClientListItemComponent extends ListItem {
     render(): React.ReactNode {
-        return <li key={this.props.line.sequence.toString()} className={'ToClient'}>{this.CreateClauseComponents()}</li>;
+        return <li key={this.props.line.sequence.toString()} >
+            {this.renderClauses(this.reprocessFirstClause("To client", "ToClient", this.CreateClauseComponents()))}
+        </li>;
     }
 }
 
 class FromClientListItemComponent extends ListItem {
     render(): React.ReactNode {
-        return <li key={this.props.line.sequence.toString()} className={'FromClient'}>{this.CreateClauseComponents()}</li>;
+        return <li key={this.props.line.sequence.toString()} >
+            {this.renderClauses(this.reprocessFirstClause("From client", "FromClient", this.CreateClauseComponents()))}
+        </li>;
     }
 }
 

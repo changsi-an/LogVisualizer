@@ -135,7 +135,7 @@ class List extends React.Component<{}, {
 
     render() {
         return <Fabric id={'list'} >
-            <h1 className={'ms-font-su'}>Hi! {this.state.record}</h1>
+            <h1 className={'ms-font-su'}>{this.state.record} Logs Loaded!</h1>
             <div className={"content"}>
                 <ol>{
                     this.state.rawLines.map((line) => createListItem({

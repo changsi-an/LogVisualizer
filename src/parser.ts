@@ -9,6 +9,8 @@ export interface Clause {
 }
 
 export class PlainText implements Clause {
+    public style: string;
+
     constructor(public text: string, public start: number, public end: number) {
     }
 }
