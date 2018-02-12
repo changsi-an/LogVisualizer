@@ -10,10 +10,12 @@ import { Fabric } from 'office-ui-fabric-react/lib/Fabric';
 import { DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import {remote} from 'electron';
 
+
+import {config} from './config';
 import {ReadLogFileContent, RPCService, services} from './RPCServices'
 import {createListItem} from './components';
 import * as colors from './colors';
-import {IButtonProps} from "office-ui-fabric-react";
+import {Checkbox, IButtonProps} from "office-ui-fabric-react";
 
 
 let readFileLogContent: RPCService<string> = services[ReadLogFileContent.Method];
@@ -157,6 +159,16 @@ class List extends React.Component<{}, {
                 <Legend text={'From Debugee'} primaryColor={colors.FromTargetColor.toHexString()} />
                 <Legend text={'From VSCode / PineZorro'} primaryColor={colors.FromClientColor.toHexString()} />
                 <Legend text={'To VSCode / PineZorro'} primaryColor={colors.ToClientColor.toHexString()} />
+                <Checkbox
+                    checked = {config.fillFullLine}
+                    label='Fill full line.'
+                    onChange={ (event, isChecked) => {
+                        this._onFillFullLineChange(event, isChecked);
+                    } }
+                    ariaDescribedBy={ 'descriptionID' }
+
+                    className={'fullFullLineCheckbox'}
+                />
             </footer>
         </Fabric>;
     }
@@ -175,6 +187,12 @@ class List extends React.Component<{}, {
             record: this._logData.LineCount,
             rawLines: rawLines
         });
+    }
+
+    private _onFillFullLineChange(event: React.FormEvent<HTMLElement>, isChecked: boolean) {
+        config.fillFullLine = isChecked;
+
+        this.forceUpdate();
     }
 }
 
