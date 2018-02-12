@@ -2,6 +2,8 @@ import * as electron from 'electron';
 import * as fs from 'fs';
 
 import * as _ from 'lodash';
+import * as defaultMenu from 'electron-default-menu';
+
 import {initialize} from './mainThreadServices';
 
 // Module to control application life.
@@ -29,6 +31,10 @@ function createWindow() {
     }
 
     initialize(logFilePath);
+
+    const menu = defaultMenu(app, electron.shell);
+
+    electron.Menu.setApplicationMenu(electron.Menu.buildFromTemplate(shrinkMenu(menu)));
 
     // Create the browser window.
     mainWindow = new BrowserWindow({width: 800, height: 600});
@@ -73,6 +79,14 @@ app.on('activate', function () {
         createWindow()
     }
 });
+
+function shrinkMenu(menu: any) {
+    menu[0].submenu = _.filter(menu[0].submenu, (e) => {
+         return e.label != 'Undo' && e.label!= 'Redo' && e.label != 'separator';
+    });
+
+    return menu.splice(0, menu.length - 1);
+}
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.

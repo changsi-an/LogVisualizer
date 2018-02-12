@@ -33,6 +33,7 @@
     "typescript": "^2.7.1"
   },
   "dependencies": {
+    "electron-default-menu": "^1.0.1",
     "electron-in-page-search": "^1.2.4",
     "lodash": "^4.17.5",
     "office-ui-fabric-react": "^5.49.0",
