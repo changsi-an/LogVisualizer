@@ -118,8 +118,6 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
             sections.push(new PlainText(text.substring(end + 1), first.start + end + 1, first.start + text.length - 1));
         }
 
-        console.log(sections.concat(remainding));
-
         return sections.concat(remainding);
     }
 

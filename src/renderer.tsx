@@ -4,10 +4,11 @@ import * as stream from 'stream';
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as tinycolor from 'tinycolor2';
+const searchInPage = require('electron-in-page-search').default;
 import {initializeIcons} from '@uifabric/icons';
 import { Fabric } from 'office-ui-fabric-react/lib/Fabric';
 import { DefaultButton } from 'office-ui-fabric-react/lib/Button';
-
+import {remote} from 'electron';
 
 import {ReadLogFileContent, RPCService, services} from './RPCServices'
 import {createListItem} from './components';
@@ -24,9 +25,15 @@ async function run(): Promise<void> {
 
     initializeIcons();
 
+
+    const searchInWindow = searchInPage(remote.getCurrentWebContents());
     ReactDOM.render(
             <List />,
-            document.getElementById("app")
+            document.getElementById("app"),
+
+        () => {
+            searchInWindow.openSearchWindow();
+        }
     );
 }
 
