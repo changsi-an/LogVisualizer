@@ -16,13 +16,57 @@ export interface ListItemState {
 
 export class JsonComponent extends React.Component<{
     json: JSONSection;
-}, {}>{
+}, {
+    expanded: boolean
+}>{
+    private _expandedJson: string;
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            expanded: false
+        };
+    }
     render() {
-        return <div className={'jsonClause'}>
-            <span className={"emoji"}>↔️</span>
-            <span>{this.props.json.text}</span>
-            <span className={"emoji"}>↔️</span>
-        </div>
+        return this.state.expanded ?
+                <div className={'jsonClause dedicated'}>
+                    <span className={"emoji"} onClick={(event) => {
+                        return this.shrinkJson(event);
+                    }}>↕️</span>
+                    <span dangerouslySetInnerHTML={{__html: this._expandedJson}}/>
+                    <span className={"emoji"} onClick={(event) => {
+                        return this.shrinkJson(event);
+                    }}>↕️</span>
+                </div> :
+                <div className={'jsonClause'}>
+                    <span className={"emoji"} onClick={(event) => {
+                        return this.expandJson(event);
+                    }}>↔️</span>
+                    <span>{this.props.json.text}</span>
+                    <span className={"emoji"} onClick={(event) => {
+                        return this.expandJson(event);
+                    }}>↔️</span>
+                </div>
+
+    }
+
+    expandJson(event: React.MouseEvent<HTMLSpanElement>) {
+        if (!this._expandedJson) {
+            this._expandedJson = JSON.stringify(this.props.json.obj, null, "&nbsp;");
+            this._expandedJson = this._expandedJson.replace(/\n/g, "<br/>");
+            this._expandedJson = this._expandedJson.replace(/&nbsp;/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
+        }
+
+        this.setState({
+            expanded: true
+        });
+    }
+
+    shrinkJson(event: React.MouseEvent<HTMLSpanElement>) {
+        this.setState({
+            expanded: false
+        })
     }
 }
 

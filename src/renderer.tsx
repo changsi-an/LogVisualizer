@@ -3,8 +3,17 @@ import * as readline from 'readline';
 import * as stream from 'stream';
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import * as tinycolor from 'tinycolor2';
+import {initializeIcons} from '@uifabric/icons';
+import { Fabric } from 'office-ui-fabric-react/lib/Fabric';
+import { DefaultButton } from 'office-ui-fabric-react/lib/Button';
+
+
 import {ReadLogFileContent, RPCService, services} from './RPCServices'
 import {createListItem} from './components';
+import * as colors from './colors';
+import {IButtonProps} from "office-ui-fabric-react";
+
 
 let readFileLogContent: RPCService<string> = services[ReadLogFileContent.Method];
 let fileContent: string;
@@ -12,6 +21,8 @@ let fileContent: string;
 async function run(): Promise<void> {
 
     fileContent = await readFileLogContent.call('');
+
+    initializeIcons();
 
     ReactDOM.render(
             <List />,
@@ -74,6 +85,38 @@ class LogData {
     }
 }
 
+interface LegendProps extends IButtonProps {
+    primaryColor: string;
+}
+class Legend extends React.Component<LegendProps, {}>  {
+    constructor(props: LegendProps) {
+        super(props);
+    }
+
+    render() {
+        return <DefaultButton
+            disabled={ false }
+            checked={ false}
+            text={this.props.text}
+            styles={
+                {
+                    root: {
+                        background: this.props.primaryColor
+                    },
+
+                    rootHovered: {
+                        background: tinycolor(this.props.primaryColor).brighten(10).toHexString()
+                    },
+
+                    rootPressed: {
+                        background: tinycolor(this.props.primaryColor).brighten(10).toHexString()
+                    }
+                }
+            }
+        />
+    }
+}
+
 class List extends React.Component<{}, {
     record: number,
     rawLines: LineData[]
@@ -91,8 +134,8 @@ class List extends React.Component<{}, {
     }
 
     render() {
-        return <div id={'list'}>
-            <h1>Hi! {this.state.record}</h1>,
+        return <Fabric id={'list'} >
+            <h1 className={'ms-font-su'}>Hi! {this.state.record}</h1>
             <div className={"content"}>
                 <ol>{
                     this.state.rawLines.map((line) => createListItem({
@@ -102,11 +145,13 @@ class List extends React.Component<{}, {
                 }
                 </ol>
             </div>,
-            <footer>Legend: <span className={'ToTarget'}>To Debugee</span> <span className={'FromTarget'}>From Debugee</span>
-                <span className={'FromClient'}>From VSCode / PineZorro</span>
-                <span className={'ToClient'}>To VSCode / PineZorro</span>
+            <footer>Legend:
+                <Legend text={'To Debugee'} primaryColor={colors.ToTargetColor.toHexString()} />
+                <Legend text={'From Debugee'} primaryColor={colors.FromTargetColor.toHexString()} />
+                <Legend text={'From VSCode / PineZorro'} primaryColor={colors.FromClientColor.toHexString()} />
+                <Legend text={'To VSCode / PineZorro'} primaryColor={colors.ToClientColor.toHexString()} />
             </footer>
-        </div>;
+        </Fabric>;
     }
 
     async componentDidMount() {

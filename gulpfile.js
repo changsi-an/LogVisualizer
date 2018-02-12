@@ -5,8 +5,8 @@ let sourcemaps = require('gulp-sourcemaps');
 
 let tsProject = ts.createProject('tsconfig.json');
 
-gulp.task('package.json', function () {
-    return gulp.src('./package.json')
+gulp.task('copy', function() {
+    return gulp.src(['./package.json', './src/style.less'])
         .pipe(gulp.dest('./out/'));
 });
 
@@ -33,4 +33,4 @@ gulp.task('less', function () {
 
 
 gulp.task('build', ['ts', 'less']);
-gulp.task('default', ['build', 'package.json']);
+gulp.task('default', ['build', 'copy']);

@@ -42,9 +42,15 @@
 
 div.jsonClause {
   display: inline-block;
+
+  &.dedicated {
+    clear:both;
+    display: block;
+  }
 }
 
 .emoji {
+  filter: grayscale(100%) brightness(200%) opacity(50%);
   cursor: pointer;
   font-weight: normal;
   font-family: "Apple Color Emoji","Segoe UI Emoji","NotoColorEmoji","Segoe UI Symbol","Android Emoji","EmojiSymbols","EmojiOne Mozilla";
