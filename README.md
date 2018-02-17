@@ -7,6 +7,8 @@ To clone and run this repository you'll need [Git](https://git-scm.com) and [Nod
 git clone https://github.com/changsi-an/LogVisualizer.git .
 # Install dependencies
 npm install
+# Build App
+gulp
 # Run the app
 run.bat [Path-To-Log-File]
 ```
