@@ -125,13 +125,15 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
     protected renderClauses(clauses: Clause[]): ReactNode {
         return <React.Fragment>
             {
-                clauses.map((clause: Clause) => {
+
+                clauses.map((clause: Clause, index: number) => {
+                    const key = index.toString();
                     if (clause instanceof JSONSection) {
-                        return <JsonComponent json={clause}/>
+                        return <JsonComponent  json={clause}/>
                     } else if (clause instanceof  PlainText) {
-                        return <PlainTextComponent text={clause}/>
+                        return <PlainTextComponent key={key} text={clause}/>
                     } else {
-                        return <div/>;
+                        return <div key={key}/>;
                     }
                 })
             }
