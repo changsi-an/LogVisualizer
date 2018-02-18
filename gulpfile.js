@@ -5,6 +5,7 @@ let webpack = require('webpack-stream');
 let less = require('gulp-less');
 let sourcemaps = require('gulp-sourcemaps');
 let del = require('del');
+const electronPackager = require('electron-packager');
 
 let tsProject = ts.createProject('tsconfig.json');
 
@@ -61,6 +62,25 @@ gulp.task('less', function () {
         paths: []
     }))
     .pipe(gulp.dest('./out/'));
+});
+
+gulp.task('publish', ['build-prod'], () => {
+    let options = {
+        dir: './out',
+        name: 'LogVisualizer',
+        executableName: 'logviz',
+        platform: 'win32',
+        overwrite: true
+    };
+
+    return electronPackager(Object.assign({
+        arch: 'x64'
+    }, options))
+    .then(() => {
+        return electronPackager(Object.assign({
+            arch: 'ia32'
+        }, options));
+    });
 });
 
 gulp.task('ts-webpack-main', () => {
