@@ -24,13 +24,18 @@
     "@types/react": "^16.0.36",
     "@types/react-dom": "^16.0.3",
     "@types/tinycolor2": "^1.4.0",
+    "awesome-typescript-loader": "^3.4.1",
+    "del": "^3.0.0",
     "electron": "~1.7.8",
     "electron-packager": "^10.1.2",
     "gulp": "^3.9.1",
     "gulp-less": "^3.4.0",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-typescript": "^3.2.4",
-    "typescript": "^2.7.1"
+    "source-map-loader": "^0.2.3",
+    "typescript": "^2.7.2",
+    "webpack": "^3.11.0",
+    "webpack-stream": "^4.0.1"
   },
   "dependencies": {
     "electron-default-menu": "^1.0.1",

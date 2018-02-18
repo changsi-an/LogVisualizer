@@ -5,7 +5,7 @@
         "target": "es2016",
         "sourceMap": true,
         "outDir": "out",
-        "declaration": true,
+        "declaration": false,
 
         "noUnusedLocals": true,
         "noImplicitThis": true,
