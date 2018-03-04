@@ -10,12 +10,12 @@ import { Fabric } from 'office-ui-fabric-react/lib/Fabric';
 import { DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import {remote} from 'electron';
 
-
 import {config} from './config';
 import {ReadLogFileContent, RPCService, services} from './RPCServices'
 import {createListItem} from './components';
 import * as colors from './colors';
-import {Checkbox, IButtonProps} from "office-ui-fabric-react";
+import {Checkbox, IButtonProps, MessageBar} from "office-ui-fabric-react";
+import {ReactNode} from "react";
 
 
 let readFileLogContent: RPCService<string> = services[ReadLogFileContent.Method];
@@ -128,7 +128,7 @@ class Legend extends React.Component<LegendProps, {}>  {
 
 class List extends React.Component<{}, {
     record: number,
-    rawLines: LineData[]
+    rawLines: ReactNode[]
 }> {
 
     private _logData: LogData;
@@ -144,13 +144,11 @@ class List extends React.Component<{}, {
 
     render() {
         return <Fabric id={'list'} >
+            <MessageBar>Info lorem ipsum dolor sit amet, a elit sem interdum consectetur adipiscing elit. </MessageBar>
             <h1 className={'ms-font-su'}>{this.state.record} Logs Loaded!</h1>
             <div className={"content"}>
                 <ol>{
-                    this.state.rawLines.map((line) => createListItem({
-                        "key": line.sequence.toString(),
-                        line: line
-                    }))
+                    this.state.rawLines
                 }
                 </ol>
             </div>,
@@ -178,15 +176,43 @@ class List extends React.Component<{}, {
 
         await this._logData.preloadAllData();
 
-        let rawLines: LineData[] = [];
+        let rawLines: ReactNode[] = [];
 
-        for await (const line of this._logData.readLine()) {
-            rawLines.push(line);
-        }
-        this.setState({
-            record: this._logData.LineCount,
-            rawLines: rawLines
-        });
+        let count = 0;
+        const iter = this._logData.readLine();
+
+        const iterProc = async () : Promise<void> => {
+            const iterNode = await iter.next();
+
+            if (iterNode.done) {
+                return Q.resolve<void>();
+            }
+
+            const line = iterNode.value;
+
+            const renderCompletion = Q.defer<void>();
+
+            const newLineComponent = createListItem({
+                key: line.sequence.toString(),
+                line: line,
+                onFirstRendered: renderCompletion
+            });
+
+            rawLines.push(newLineComponent);
+
+            let returnPromise = renderCompletion.promise.then(() => {
+                return iterProc();
+            });
+
+            this.setState({
+                record: ++count,
+                rawLines: rawLines
+            });
+
+            return returnPromise;
+        };
+
+        Q(iterProc()).done();
     }
 
     private _onFillFullLineChange(event: React.FormEvent<HTMLElement>, isChecked: boolean) {

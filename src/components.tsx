@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as Q from "q";
 import {LineData} from './renderer'
 import {ReactNode} from "react";
 
@@ -9,6 +10,7 @@ import {breakDownLogStatement, Clause, PlainText, JSONSection} from './parser';
 export interface ListItemProps {
     key: string;
     line?: LineData;
+    onFirstRendered?: Q.Deferred<void>
 }
 
 export interface ListItemState {
@@ -83,12 +85,18 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
         super(props);
     }
 
+    public componentDidMount() {
+        if (this.props.onFirstRendered) {
+            this.props.onFirstRendered.resolve();
+        }
+    }
+
 
     protected CreateClauseComponents(): Clause[] {
         return breakDownLogStatement(this.props.line.text);
     }
 
-    protected reprocessFirstClause(search: string, style: string, clauses: Clause[]): Clause[] {
+    protected static reprocessFirstClause(search: string, style: string, clauses: Clause[]): Clause[] {
         const [first, ...remainding] = clauses;
 
         if (!(first instanceof PlainText)) {
@@ -129,7 +137,7 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
                 clauses.map((clause: Clause, index: number) => {
                     const key = index.toString();
                     if (clause instanceof JSONSection) {
-                        return <JsonComponent  json={clause}/>
+                        return <JsonComponent key={key} json={clause}/>
                     } else if (clause instanceof  PlainText) {
                         return <PlainTextComponent key={key} text={clause}/>
                     } else {
@@ -140,6 +148,8 @@ export class ListItem extends React.Component<ListItemProps, ListItemState> {
 
         </React.Fragment>;
     }
+
+
 }
 
 class PlatTextListItemComponent extends ListItem {
@@ -155,7 +165,7 @@ class ToTargetListItemComponent extends ListItem {
 
     render(): React.ReactNode {
         return <li key={this.props.line.sequence.toString()} className={config.fillFullLine ? 'ToTarget' : ''}>
-            {this.renderClauses(this.reprocessFirstClause("To target", "ToTarget", this.CreateClauseComponents()))}
+            {this.renderClauses(ListItem.reprocessFirstClause("To target", "ToTarget", this.CreateClauseComponents()))}
         </li>;
     }
 }
@@ -163,14 +173,14 @@ class ToTargetListItemComponent extends ListItem {
 class FromTargetListItemComponent extends ListItem {
     render(): React.ReactNode {
         return <li key={this.props.line.sequence.toString()} className={config.fillFullLine ? 'FromTarget' : ''}>{
-            this.renderClauses(this.reprocessFirstClause("From target", "FromTarget", this.CreateClauseComponents()))}</li>;
+            this.renderClauses(ListItem.reprocessFirstClause("From target", "FromTarget", this.CreateClauseComponents()))}</li>;
     }
 }
 
 class ToClientListItemComponent extends ListItem {
     render(): React.ReactNode {
         return <li key={this.props.line.sequence.toString()} className={config.fillFullLine ? 'ToClient' : ''}>
-            {this.renderClauses(this.reprocessFirstClause("To client", "ToClient", this.CreateClauseComponents()))}
+            {this.renderClauses(ListItem.reprocessFirstClause("To client", "ToClient", this.CreateClauseComponents()))}
         </li>;
     }
 }
@@ -178,7 +188,7 @@ class ToClientListItemComponent extends ListItem {
 class FromClientListItemComponent extends ListItem {
     render(): React.ReactNode {
         return <li key={this.props.line.sequence.toString()} className={config.fillFullLine ? 'FromClient' : ''}>
-            {this.renderClauses(this.reprocessFirstClause("From client", "FromClient", this.CreateClauseComponents()))}
+            {this.renderClauses(ListItem.reprocessFirstClause("From client", "FromClient", this.CreateClauseComponents()))}
         </li>;
     }
 }
