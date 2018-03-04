@@ -15,7 +15,7 @@ const webpackConfig = {
     },
 
     node: {
-        __dirname: true
+        __dirname: false
     },
 
     module: {
@@ -39,7 +39,7 @@ const webpackConfig = {
 };
 
 gulp.task('copy', function() {
-    return gulp.src(['./package.json', './src/style.less'])
+    return gulp.src(['./package.json', './src/index.html', './src/style.less'])
         .pipe(gulp.dest('./out/'));
 });
 
