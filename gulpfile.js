@@ -43,6 +43,15 @@ gulp.task('copy', function() {
         .pipe(gulp.dest('./out/'));
 });
 
+gulp.task('copy-electron-search-in-page', function() {
+    return gulp.src([
+        './node_modules/electron-in-page-search/src/*.js',
+        './node_modules/electron-in-page-search/src/*.css',
+        './node_modules/electron-in-page-search/src/*.html'])
+        .pipe(gulp.dest('./out/'));
+});
+
+
 gulp.task('ts', function () {
     return gulp.src([
         'src/**/*.ts',
@@ -111,5 +120,5 @@ gulp.task('clean', () => {
 });
 
 gulp.task('build', ['clean', 'ts', 'less', 'copy']);
-gulp.task('build-prod', ['clean', 'ts-webpack', 'less', 'copy']);
+gulp.task('build-prod', ['clean', 'ts-webpack', 'less', 'copy', 'copy-electron-search-in-page']);
 gulp.task('default', ['build']);

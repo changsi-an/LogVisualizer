@@ -144,8 +144,7 @@ class List extends React.Component<{}, {
 
     render() {
         return <Fabric id={'list'} >
-            <MessageBar>Info lorem ipsum dolor sit amet, a elit sem interdum consectetur adipiscing elit. </MessageBar>
-            <h1 className={'ms-font-su'}>{this.state.record} Logs Loaded!</h1>
+            <MessageBar>{this.state.record} Logs Loaded! </MessageBar>
             <div className={"content"}>
                 <ol>{
                     this.state.rawLines
